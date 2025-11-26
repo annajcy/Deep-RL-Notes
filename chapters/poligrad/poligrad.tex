@@ -31,7 +31,7 @@ In our derivation, we mathematically derived an expression for policy gradient, 
 $$\nabla_\theta J(\theta) \simeq \frac{1}{N}\sum_{i=1}^N\left(\sum_{t=1}^T\nabla_\theta \log\pi_\theta(a_{i,t}|s_{i,t})\right)\left(\sum_{t=1}^T r(s_{i,t},a_{i,t})\right)$$
 where the subscripts $i, t$ means time step $t$ in the $i$-th rollout. With the above gradient, we can do gradient descent (ascent) on the parameter $\theta$ by:
 $$\theta \leftarrow \theta + \alpha\nabla_\theta J(\theta)$$ Now we are ready to propose a vanilla policy gradient algorithm by direct gradient ascent on the Monte Carlo-approximated policy gradient parameters, the REINFORCE Algorithm, as shown in Algorithm \ref{alg:reinforce}.
-\input{REINFORCE.tex}
+\input{chapters/poligrad/REINFORCE.tex}
 
 \section{Example: Gaussian Policy}
 Now let us work out a simple case of running Algorithm \ref{alg:reinforce} on a simple Gaussian policy. A Gaussian policy means that the policy function is a Gaussian distribution. Specifically, $\pi_\theta(a_t|s_t) = \mathcal{N}\left(f_\text{neural net}(s_t); \Sigma\right)$. One advantage of using a Gaussian policy is that it is easy to obtain a closed-form expression for the Gaussian derivative. We simply write out the quadratic discriminant function in a multivariate Gaussian distribution:
@@ -139,9 +139,9 @@ $$\theta^* = \argmaxA_\theta J(\theta)$$
 and we defined $J(\theta)$ as $J(\theta) = \mathbb{E}_{\tau\sim\pi_\theta(\tau)}\left[r(\tau)\right]$. Now if we want to estimate $J$ with some new parameter $\theta'$, we can use importance sampling as discussed above:
 $$J(\theta') = \mathbb{E}_{\tau\sim\pi_\theta(\tau)}\left[\frac{\pi_{\theta'}(\tau)}{\pi_\theta(\tau)}r(\tau)\right]$$
 then we take the gradient as:
-$$\nabla_{\theta'}J(\theta') &= 
+$$\nabla_{\theta'}J(\theta') = 
     \mathbb{E}_{\tau\sim\pi_\theta(\tau)}\left[\frac{\nabla_{\theta'}\pi_{\theta'}(\tau)}{\pi_\theta(\tau)}r(\tau)\right]\\
-    &=\mathbb{E}_{\tau\sim\pi_\theta(\tau)}\left[\frac{\pi_{\theta'}(\tau)}{\pi_\theta(\tau)}\nabla_{\theta'}\log \pi_{\theta'}(\tau)r(\tau)\right]
+    =\mathbb{E}_{\tau\sim\pi_\theta(\tau)}\left[\frac{\pi_{\theta'}(\tau)}{\pi_\theta(\tau)}\nabla_{\theta'}\log \pi_{\theta'}(\tau)r(\tau)\right]
 $$
 
 Now if we estimate it locally, by setting $\theta = \theta'$, then we will cancel out the importance ratio, ending up with $\mathbb{E}_{\tau\sim\pi_\theta(\tau)}\left[\nabla_{\theta'}\log \pi_{\theta'}(\tau)r(\tau)\right]$.

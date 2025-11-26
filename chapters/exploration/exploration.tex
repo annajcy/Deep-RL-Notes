@@ -122,7 +122,7 @@ P'(s) = \frac{N(s)+1}{n+1}
 we design our neural net density model obeying the same rule. 
 
 We devise a deep pseudo-count procedure to count the states as shown in Alg. \ref{alg:pseudocount}
-\input{pseudocount.tex}
+\input{chapters/exploration/pseudocount.tex}
 In step 5, we solve for $\hat{N}$ using the following equations:
 \begin{align*}
     p_\theta(s_i) &= \frac{\hat{N}(s_i)}{\hat{n}}\\
@@ -191,7 +191,7 @@ After updating $\phi'$, we use $D_{KL}(q(\theta|\phi')||q(\theta|\phi))$ as the 
 Imitation learning is simple, stable supervised learning, but it requires demonstrations, and it must address distributional shift. Furthermore, the state of the art imitation learning can only be as good as the demo. In contrast, reinforcement learning can become arbitrarily good, but it requires reward function, and must address exploration. Also, it often does not have convergence guarantees.
 \subsection{Pretrain and Finetune}
 Can we somehow combine the two such that we have both demonstrations data and rewards? The answer is yes. The simplest idea that is practical and works is to pretrain with imitation learning and fine tune with RL. This idea is shown in Alg. \ref{alg:pretrain}. 
-\input{pretrain.tex}
+\input{chapters/exploration/pretrain.tex}
 
 The problem with Alg. \ref{alg:pretrain} is that in step 4, we might collect very bad experience due to distribution shift, so the first batch of data might be bad, thus destroying the initialization. 
 

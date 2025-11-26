@@ -17,7 +17,7 @@ Let us start with a simple solution for model-based policy learning. Ideally, we
     \label{fig:poliback}
 \end{figure}
 Then we can modify our model-based policy-free RL algorithm to accomodate this new policy learning process in Alg. \ref{alg:mb20}.
-\input{mb20.tex}
+\input{chapters/mbpolicy/mb20.tex}
 \subsection{Vanishing and Exploding Gradients}
 One problem with Alg. \ref{alg:mb20}, or general gradient-based optimization is that as we progress into the time steps, we might encounter vanishing or exploding gradients. Because as we apply chain rule, the gradients get multiplied by each other, so we the product may get extremely big (exploding) or extremely small (vanishing), making optimization a lot harder. Furthermore, we have similar parameter sensitivity problems as shooting methods, but we no longer have convenient second order LQR-like method, because the policy function is extremely complicated and policy parameters couple all the time steps, so no dynamic programming. % what does this mean
 
@@ -40,11 +40,11 @@ Actually, given more samples to reduce variance, policy gradient is more stable 
 
 \subsection{Dyna}
 Dyna is an online Q-learning algorithm that performs model-free RL with a model. 
-\input{dyna.tex}
+\input{chapters/mbpolicy/dyna.tex}
 In step 3 of Alg. \ref{alg:dyna}, we are updating the model and reward function using the observed transition. Then in step 6, we will sample some old state and action pairs and apply the model onto the sampled pair, so the $s'$ in step 7 are synthetic next states. Intuitively, as the models get better, the expectation estimate in step 7 also gets more accurate. This algorithm seems arbitrary in many aspects, but the gist is to keep improving models and use models to improve Q-function estimation by taking expectations. 
 
 We can also generalize Dyna to see how this kind of general Dyna-style model-based RL algorithms work. The generalized algorithm is shown in Alg. \ref{alg:dynagen}.
-\input{dynagen.tex}
+\input{chapters/mbpolicy/dynagen.tex}
 \begin{figure}
     \centering
     \includegraphics[scale=0.4]{figures/dynarollout.png}
@@ -82,7 +82,7 @@ We also need to stay close to old controller if we go too far. If trajectory dis
 The high level idea of guided policy search is to use some simpler local policy such as local LQR controller to help and guide the learning process of more complex global policy learner. Essentially, we would use the local models trajectories as the training data for a supervised learning neural net that can solve all the tasks.
 
 However, one problem is that the local policies might not be able to be reproduced using a single neural net. Therefore, after training the global policy with supervised learning, we need to reoptimize the local policies using the global policy so that the policies are consistent with each other. The sketch of guided policy search is shown in Alg. \ref{alg:guided}. Note that the cost function $\Tilde{c}_{k,i}$ is the modified cost function to keep $\pi_{LQR}$ close to $\pi_\theta$.
-\input{guided.tex}
+\input{chapters/mbpolicy/guided.tex}
 
 In Divide and Conquer RL, the idea is similar, except that we are replacing the local LQR controllers with local neural net. 
 

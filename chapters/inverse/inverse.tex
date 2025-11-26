@@ -72,7 +72,7 @@ If we let $\mu_t(s_t,a_t)\propto\beta(s_t,a_t)\alpha(s_t)$, then the second expe
 where $\mu_t$ is the state-action visitation probability for each $(s_t,a_t)$.
 
 Now we are ready to sketch out our MaxEnt Inverse RL algorithm in Alg. \ref{alg:maxent}. We can use this to learn the reward function.
-\input{maxent.tex}
+\input{chapters/inverse/maxent.tex}
 Why is it called maximum entropy (MaxEnt)? Because in cases where $r_\psi(s_t,a_t) = \psi^Tf(s_t,a_t)$, we can show that Alg. \ref{alg:maxent} oprimizes
 \[
 \max_\psi\mathcal{H}(\pi^{r_\psi})\;\text{s.t. }\;\;
