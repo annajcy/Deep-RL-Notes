@@ -29,12 +29,12 @@ and we can just use the current estimate inside the nested expectation for simpl
 
 According to our definition of the implicit policy function $\pi'$, the policy is actually deterministic. Therefore, we can completely get rid of the outside expectation, and the value function update can be further simplified as:
 $$V^\pi(s)\leftarrow r(s,\pi(s)) + \gamma\mathbb{E}_{s'\sim p(s'|s,a)}\left[V^\pi(s')\right]$$
-\input{chapters/value/policyiter1.tex}
+\input{chapters/05_value/policyiter1.tex}
 This version of policy iteration is sketched in Algorithm \ref{alg:policyiter1}
 
 We can even further simplify the dynamic programming update. Note that in each iteration, we are updating the policy first in order to update the value function. Thus, it would be faster if we could skip the policy part and directly improve the value estimation. Meanwhile, the $\argmaxA$ operation that we apply on the advantage function itself is an implicit policy. We also know that $\argmaxA_{a_t}A^\pi(s,a) = \argmaxA_{a_t}Q^\pi(s,a)$, because the two values only differ by the subtraction term $V^\pi$, which does not depend on action:
 $$A^\pi(s,a) = r(s,a) + \gamma\mathbb{E}\left[V^\pi(s')\right]$$
-\input{chapters/value/policyiter2.tex}
+\input{chapters/05_value/policyiter2.tex}
 Having this, we can simplify the policy iteration algorithm further, as illustrated in Alg. \ref{alg:policyiter2}. As we skipped the policy update part, we call this new, simplified algorithm ``value iteration algorithm''.
 
 \section{Fitted Value Iteration}
@@ -43,13 +43,13 @@ The policy iteration and value iteration algorithm we discussed above are heavil
 \subsection{Fitted Supervised Value Iteration Algorithm}
 Since we know that the value function is defined as $\max_a Q^\pi(s,a)$, we can use this definition as the labels for the value function in order to define an L2 loss function:
 $$\mathcal{L}(\phi) = \frac{1}{2}\lvert|V_\phi(s) - \max_{a}Q^\pi(s,a)|\rvert^2$$
-\input{chapters/value/fittedvaliter.tex}
+\input{chapters/05_value/fittedvaliter.tex}
 Then we can sketch out a simple fitted value iteration algorithm using this loss function in Algorithm \ref{alg:fittedvaliter}. Note that when setting the label, the ideal step to take is to enumerate all the states and find the corresponding label. However, when it is impractical, one could just use some samples and enumerate all the actions to find the labels. Moreover, when we take the maximum over all the actions from a state, we implicitly assume that the transition dynamics are known. Why? Because we want to take an action, record the value of that action, and then roll back to the previous state in order to check the values of other actions. Thus, without the transition dynamics, we cannot easily take the maximum.
 \subsection{Fitted Q-Iteration Algorithm}
 To address this problem, we can apply the same ``max'' trick in policy iteration. In policy iteration, we skip the policy update and calculate the values directly. Here in fitted value iteration, we can get around the transition dynamics by looking up the Q function table, because $V_\phi(s) \simeq \max_{a}Q_\phi(s,a)$, and this max operation is merely a table lookup from the Q value table. Consequently, we are now iterating on the Q values. Such a method works for off-policy samples (unlike actor-critic), and it only needs one network, so it does not have any high-variance policy gradient. However, as we shall see in later sections, such methods do not have convergence guarantees on non-linear functions, which could potentially be problematic.
 
 The full fitted Q-iteration algorithm is shown in Algorithm \ref{alg:fittedQ}.
-\input{chapters/value/fittedQ.tex}
+\input{chapters/05_value/fittedQ.tex}
 \subsection{A Closer Look at Q-Iteration Algorithm}
 Let us take a closer look at the fitted Q-learning algorithm. 
 First, let us discuss why the algorithm is fully off-policy. In step 2 of Alg. \ref{alg:fittedQ}, we are not collecting a lot of transition data, and we do not care about the trajectories. Furthermore, in step 4, we are taking the step off-policy in that we do not care about which state we are going to, because we only care about the value of the transition. In other words, the tansition we take is independent of the unknown policy $\pi$. Therefore, the fitted Q-iteration algorithm is fully off-policy.
@@ -60,7 +60,7 @@ So in this particular step, we are optimizing the Bellman Error, and if $\epsilo
 
 \subsection{Online Q-Iteration Algorithm}
 We can also make the samples more efficient by making the Q-iteration algorithm completely online. By online we mean that we do not store any transition. Instead, we take one transition and immediately apply the transition to our value update. The online version of Q-Iteration Algorithm is sketched in Alg. \ref{alg:onlineQiter}.
-\input{chapters/value/onlineQiter.tex}
+\input{chapters/05_value/onlineQiter.tex}
 As we see in step 2 of the algorithm, we are taking an action off-policy, so we have a lot of choices to make. 
 
 \section{Value Function Learning Theory}

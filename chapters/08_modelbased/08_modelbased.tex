@@ -39,11 +39,11 @@ Perhaps the easiest and most intuitive stochastic optimization method in open-lo
 CEM improves upon the random shooting's guess and check scheme by choosing some elites sequences which give us higher rewards and refit the distribution to the high rewards. Intuitively, we are getting closer to higher rewards as we refit the distribution. Here is a sketch of CEM, as shown in Alg. \ref{alg:cem}. Usually there are two different criteria for CEM termination. The first one is simply just upper bound the maximum number of iterations. The second one is more subtle. For example, if we model the distribution as normal, we wish to stop if the distribution becomes ``narrow'' enough eventually, and we can say that we stop CEM when the fit standard deviation is below some threshold value. 
 
 When we ``fit'' a distribution, what we are actually doing is to iteratively search for the best parameters to find a distribution from which we can sample to give us the best cost-to-go value. In a normal distribution, we are just learning $\mu$ and $\sigma$.
-\input{chapters/modelbased/cem.tex}
+\input{chapters/08_modelbased/cem.tex}
 This algorithm is extremely simple and very fast if parallelized. However, it suffers from very harsh dimensionality limit and it only works for open-loop scenarios. 
 \subsection{Monte Carlo Tree Search}
 Now imagine our action space is discrete, we can apply a stochastic optimization technique called Monte Carlo Tree Search (MCTS), which is very popular in planning in stochastic games. The gist of this method is that in discrete action space, we are essentially expanding out a tree. However, the tree might be too big to expand out due to computational cost. Therefore, one way to save the computational cost is to partially expand the tree and use a policy to simulate a trajectory from the last expanded node. A generic sketch of MCTS is shown in Alg. \ref{alg:mcts}.
-\input{chapters/modelbased/mcts.tex}
+\input{chapters/08_modelbased/mcts.tex}
 Note that we the tree policy is not an actual policy, because it is just a method to traverse through our tree in order to select a node to expand. The default policy is an actual policy that is able to simulate the system. Since simulations are involved here, we have to be able to roll back to the original state.
 \subsection{UCT Tree Policy}
 
@@ -140,7 +140,7 @@ solving the equation, we have the following expression for $u_{T-1}$:
 \end{align*}
 
 Applying the same technique backwards, we can solve for the states and inputs at each time step, as illustrated in Alg. \ref{alg:lqr}.
-\input{chapters/modelbased/lqr.tex}
+\input{chapters/08_modelbased/lqr.tex}
 In step 5 of Alg. \ref{alg:lqr}, Q-function represents the total cost from now until end if we take $u_t$ from state $x_t$, and in step 11, the V-function represents the total cost from now until end from state $x_t$, so $V(x_t) = \min_{u_t}Q_{x_t,u_t}$, which we call the cost-to-go function. The above derivation is one of the many derivations of the Riccati Equation.
 
 What we have analyzed above is based on deterministic dynamics. What if the transition (dynamics) is stochastic? Specifically, consider the following setup:
@@ -169,7 +169,7 @@ where
     c_t &= \nabla_{x_t,u_t}c(\delta x_t, \delta u_t)
 \end{align*}
 Then we can iteratively run LQR with dynamics $\Bar{f}$, cost $\Bar{c}$, state $\delta x_t$, and action $\delta u_t$.
-\input{chapters/modelbased/ilqr.tex}
+\input{chapters/08_modelbased/ilqr.tex}
 
 A sketch of iLQR is shown in Alg. \ref{alg:ilqr}. In essence, iLQR is an approximation of Newton's method for solving $\min_{u_1,...,u_T}c(x_1,u_1) + c(f(x_1,u_1),u_2)+...+c(f(f(...)...),u_T)$.
 
@@ -179,15 +179,15 @@ In this section, we are going to cover a rather simpler case of model-based RL. 
 Why do we learn the model? Because when the model is unknown, we can learn the model so that we know $f(s_t,a_t) = s_{t+1}$ or $p(s_{t+1}|s_t,a_t)$ in stochastic case, we could use the tools from optimal control to maximize our rewards. 
 
 Our first attempt is naive, we learn $f(s_t,a_t)$ from data, and then plan through it. We call this approach model-based RL version 0.5, or vanilla model-based RL, as shown in algorithm \ref{alg:mb05}.
-\input{chapters/modelbased/mb05.tex}
+\input{chapters/08_modelbased/mb05.tex}
 This is essentially what people do in system identification, which is a technique used in classic robotics, and it is effective when we can hand-engineer a dynamics representation using our knowledge of physics, and fit just a few parameters. However, it does not work generally because of distribution mismatch: when the model is imperfect, we might suffer from false learning. Furthermore, since we are blindly following a trajectory, the mismatch exacerbates as we use more expressive model classes, when $p_{\pi_0}(s_t)\neq p_{\pi_f}(s_t)$.
 
 Acknowledging this disadvantage, we could improve the vanilla model-based RL by making $p_{\pi_0}(s_t) = p_{\pi_f}(s_t)$. As we have seen in Alg. \ref{alg:dagger}, we can keep aggregating data into our dataset in order to make our model converge to demonstration model. Applying the same approach, we keep updating the dataset by running the current model, and then update the model accordingly. Take a look at the updated model-based RL algorithm in Alg. \ref{alg:mb10}.
-\input{chapters/modelbased/mb10.tex}
+\input{chapters/08_modelbased/mb10.tex}
 Version 1.0 addresses the model mismatch issue and drives the current model as close as possible to the true dynamics model. However, we are still blindly following a trajectory in step 5 of Alg. \ref{alg:mb10}, and if we made a mistake, we would follow the wrong step which makes the mistake exacerbate. Therefore, we need to somehow adjust our plan as time goes on. One way to do this is to borrow some ideas from modern control theory: Model Predictive Control (MPC).
 
 In MPC, we are given the system's dynamics model, and we are trying to design an adaptive controller by solving a finite time constrained optimal control problem at each time step, and take only the first action in the generated sequence of actions. Then we replan based on the new state. For sake of simplicity, we will skip the discussion about safe set and terminal set in MPC in this chapter. But the ``replan'' idea in MPC is exactly what we need to improve our model-based RL version 1.0. We essentially are aiming to take one action in the planned sequence and only observe one new state, and then append the observed transition to our dataset $\mathcal{D}$. The improvement is shown in Alg. \ref{alg:mb15}.
-\input{chapters/modelbased/mb15.tex}
+\input{chapters/08_modelbased/mb15.tex}
 The while loop in algorithm \ref{alg:mb15} refers to replanning in MPC, which is solving for an optimization problem at each time step after we take the first action planned. The for loop, however, means that we are periodically retraining the model in order to make it closer to the true underlying transition model. Intuitively, the more frequently the agent replans, the less perfect each individual plan needs to be, because since we are frequently replanning, we are able to correct our mistakes made in previous plans more easily. Consequently, one is able to correct the plans as one increase the replanning frequency. Therefore, if we are frequently replanning, we could use shorter horizons in the CFTOC problem that MPC is solving. 
 
 \subsection{Performance Gaps in Model-based RL}
@@ -274,6 +274,6 @@ For now, let us focus on a simple case where $q(s_t|o_t)$ is deterministic, beca
 Now everything is differentiable, we can train using backpropagation. 
 
 Thus, we can slightly modify Alg. \ref{alg:mb15} so that we can deal with observations and latent space. We show the sketch of this slightly modified algorithm in Alg. \ref{alg:mblatent}. In step 4, we are respectively learning the dynamics, reward model, observation model, and encoder.
-\input{chapters/modelbased/mblatent.tex}
+\input{chapters/08_modelbased/mblatent.tex}
 
 Interested readers can refer to \cite{watter2015embed} and \cite{zhang2018solar} for more information on learning from pixel-based images as latent states.

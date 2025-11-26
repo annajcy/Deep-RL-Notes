@@ -3,7 +3,7 @@ SHELL := /bin/bash
 LATEX      := pdflatex
 LATEXFLAGS := -interaction=nonstopmode -halt-on-error -file-line-error
 MAIN_TEX   := main.tex
-JOBNAME    := Deep_RL
+JOBNAME    := main
 OUT_PDF    := $(JOBNAME).pdf
 
 TEX_SOURCES := $(wildcard *.tex) $(shell find chapters -name '*.tex')

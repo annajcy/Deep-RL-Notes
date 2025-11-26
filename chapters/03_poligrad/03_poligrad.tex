@@ -31,7 +31,7 @@ In our derivation, we mathematically derived an expression for policy gradient, 
 $$\nabla_\theta J(\theta) \simeq \frac{1}{N}\sum_{i=1}^N\left(\sum_{t=1}^T\nabla_\theta \log\pi_\theta(a_{i,t}|s_{i,t})\right)\left(\sum_{t=1}^T r(s_{i,t},a_{i,t})\right)$$
 where the subscripts $i, t$ means time step $t$ in the $i$-th rollout. With the above gradient, we can do gradient descent (ascent) on the parameter $\theta$ by:
 $$\theta \leftarrow \theta + \alpha\nabla_\theta J(\theta)$$ Now we are ready to propose a vanilla policy gradient algorithm by direct gradient ascent on the Monte Carlo-approximated policy gradient parameters, the REINFORCE Algorithm, as shown in Algorithm \ref{alg:reinforce}.
-\input{chapters/poligrad/REINFORCE.tex}
+\input{chapters/03_poligrad/REINFORCE.tex}
 
 \section{Example: Gaussian Policy}
 Now let us work out a simple case of running Algorithm \ref{alg:reinforce} on a simple Gaussian policy. A Gaussian policy means that the policy function is a Gaussian distribution. Specifically, $\pi_\theta(a_t|s_t) = \mathcal{N}\left(f_\text{neural net}(s_t); \Sigma\right)$. One advantage of using a Gaussian policy is that it is easy to obtain a closed-form expression for the Gaussian derivative. We simply write out the quadratic discriminant function in a multivariate Gaussian distribution:
